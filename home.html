@@ -1,0 +1,115 @@
+<!Doctype html>
+<html>
+	<head>
+		<title>
+			Blog
+		</title>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <!-- Import Google Fonts -->
+        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <!-- Compiled and minified CSS -->
+  		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+
+	</head>
+
+	<body>
+		<nav class="z-depth-2 blue">
+		    <div class="nav-wrapper container">
+	      		<a href="#" class="brand-logo">LOGO</a>
+		      	<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+		      	<ul class="right hide-on-med-and-down">
+		        	<li><a href="#login">LOGIN</a></li>
+		        	<li><a href="#signup">SIGNUP</a></li>
+		      	</ul>
+		      	<ul class="side-nav" id="mobile-demo">
+		        	<li><a href="#login">LOGIN</a></li>
+		        	<li><a href="#signup">SIGNUP</a></li>
+	        	</ul>
+		    </div>
+	  	</nav>
+
+	  	<div id="login" class="modal">
+	  		<div class="modal-content">
+	  			<div class="row">
+	  				<h5 class="center-align">Login</h5>
+	  				<form action="db_functions.php" method="post" enctype="multipart/form-data">
+	  					<div class="row">
+				      		<div class="input-field col s12">
+				      			<i class="material-icons prefix">email</i>
+				      			<input id="email" name="email" type="email" class="validate">
+				      			<label for="email" data-error="Enter a valid Email Address">Email Address</label>
+			      			</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="input-field col s12">
+		      					<i class='material-icons prefix'>lock</i>
+		      					<input type="password" id="password" name="password">
+		      					<label for="password">Password</label>
+		      				</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="col s12">
+		      					<input type="submit" class="waves-effect waves-light btn">
+		      				</div>
+		      			</div>
+	  				</form>
+	  			</div>
+	  		</div>
+	  	</div>
+
+	  	<div id="signup" class="modal">
+	  		<div class="modal-content">
+	  			<div class="row">
+	  				<form class="col s12" action="db_functions.php" method="post" enctype="multipart/form-data">
+	  					<div class="row">
+				      		<div class="input-field col s6">
+				      			<i class="material-icons prefix">account_box</i>
+				      			<input id="first_name" name="first_name" type="text" class="validate">
+				      			<label for="first_name" data-error="Enter a valid Email Address">First Name</label>
+			      			</div>
+			      			<div class="input-field col s6">
+				      			<i class="material-icons prefix">account_box</i>
+				      			<input id="first_name" name="first_name" type="text" class="validate">
+				      			<label for="first_name" data-error="Enter a valid Email Address">Last Name</label>
+			      			</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="input-field col s12">
+				      			<i class="material-icons prefix">email</i>
+				      			<input id="email" name="email" type="email" class="validate">
+				      			<label for="email" data-error="Enter a valid Email Address">Email Address</label>
+			      			</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="input-field col s12">
+		      					<i class='material-icons prefix'>lock</i>
+		      					<input type="password" id="password" name="password">
+		      					<label for="password">Password</label>
+		      				</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="input-field col s12">
+		      					<i class="material-icons prefix">lock</i>
+		      					<input id="confirm_password" name="confirm_password" type="password">
+		      					<label for="confirm_password">Confirm Password</label>
+		      				</div>
+		      			</div>
+		      			<div class="row">
+		      				<div class="col offset-s1">
+		      					<input type="submit" class="waves-effect waves-light btn">
+		      				</div>
+		      			</div>
+	  				</form>
+	  			</div>
+	  		</div>
+	  	</div>
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="js/materialize.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$('.modal').modal();
+			});
+		</script>
+	</body>
+</html>
