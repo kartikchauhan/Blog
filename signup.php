@@ -1,32 +1,38 @@
 <?php
 
+	require_once('db_connect.php');
+
 	class signup
 	{
-		function __construct($name, username, $email, $password, $confirm_password)
+		private $name;
+		private $username;
+		private $email;
+		private $password;
+		private $confirm_password;
+		private $regex_name = '/^[a-zA-Z][a-zA-Z ]*$/';
+		private $username_available = array();
+		private $name_as_username;
+		private $first_name_as_username;
+		private $last_name_as_username;
+
+		public function __set($property, $value)
 		{
-			private $regex_name = '/^[a-zA-Z][a-zA-Z ]*$/';
-			private $username_available = new splFixedArray(3);
-			private $name_as_username;
-			private $first_name_as_username;
-			private $last_name_as_username;
-			public $json = new splFixedArray(2);
-
-			private function __set($property, $value)
+			if(property_exists($this, $property))
 			{
-				if(property_exists($this, $property))
-				{
-					$this->$property = $value;
-				}
+				$this->$property = $value;
 			}
+		}
 
-			private function __get($property)
+		public function __get($property)
+		{
+			if(property_exists($this, $property))
 			{
-				if(property_exists($this, $property))
-				{
-					return $this->$property;
-				}
+				return $this->$property;
 			}
+		}
 
+		function __construct($name, $username, $email, $password, $confirm_password)
+		{
 			try
 			{
 				if(empty($name))
@@ -44,10 +50,10 @@
 				if(empty($confirm_password))
 					throw new Exception("Confirm Passsword field can't be blank");
 
-				if(!preg_match($regex_name, $name))
+				if(!preg_match($this->regex_name, $name))
 					throw new Exception("Name can contain letters and whitespaces only");
 
-				if(filter_var($email, FILTER_VALIDATE_EMAIL))
+				if(!filter_var($email, FILTER_VALIDATE_EMAIL))
 					throw new Exception("Enter a valid email address");
 
 				if(strlen($password) < 6)
@@ -56,74 +62,120 @@
 				if($password!=$confirm_password)
 					throw new Exception("Password doesn't match");
 
-				isUserExists($email);	// checking if user already exists
+				$db_connect = new db_connect;
 
-				if(isUsernameTaken($username))
+				$this->isUserExists($email);	// checking if user already exists
+
+				if($this->isUsernameTaken($username))
 				{
-					suggestUserName($name, $email);
+					$this->suggestUserName($name, $email);
 				}
+
+				$this->name = $name;
+				$this->username = $username;
+				$this->email = $email;
+				$this->password = md5($password);
+
+				$this->register();
 
 			}
 			catch(Exception $e)
 			{
-				$this->json['status'] = 1;
-				$this->json['message'] = $e->getMessage();
+				echo $e->getMessage();
 			}
+		}
 
-			private function isUserExists($)
+		private function isUserExists($email)
+		{
+			$sql = mysql_query("Select * from users where email = $email");
+			try
 			{
-				$sql = mysql_query("Select * from users where email = $email");
-				try
-				{
-					if(mysql_num_rows($sql)==1)
-					{
-						throw new Exception("Email Address already exists");
-					}
+				if(!$sql)
+					throw new Exception("Unable to execute query for isUserExists function");
 					
-				}
-				catch(Exception $e)
+				$result = mysql_fetch_array($sql);
+				if(mysql_num_rows($result)==1)
 				{
-					$this->json['status'] = 2;
-					$this->json['message'] = $e->getMessage();
+					throw new Exception("Email Address already exists");
 				}
+				
 			}
-
-			private function isUsernameTaken($username)
+			catch(Exception $e)
 			{
-				$sql = mysql_query("Select * from users where username = $username");
-				if(mysql_num_rows($sql)==1)
+				echo $e->getMessage();
+			}
+		}
+
+		private function isUsernameTaken($username)
+		{
+			$sql = mysql_query("Select * from users where username = $username");
+			try
+			{
+				if(!$sql)
+					throw new Exception("unable to execute query for isUsernameTaken function");
+					
+				$result = mysql_fetch_array($sql);
+				if(mysql_num_rows($result)==1)
 					return true;
 				else
 					return false;
 			}
-
-			private function suggestUserName($name, $email)
+			catch(Exception $e)
 			{
-				$this->json['status'] = 3;
-				$this->json['message'] = "Usernames available: ";
-				$this->name_as_username = explode(" ", $name);
-				$this->first_name_as_username = $name_as_username[0];
-				$this->last_name_as_username = $name_as_username[1];
-				for($i=0; $i<3; $i++)
-				{
-					$this->json['message'] = $this->json['message'] + (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
-					// $this->username_available[$i] = (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
-				}
-
+				echo $e->getMessage();
 			}
 		}
 
+		private function suggestUserName($name, $email)
+		{
+			$this->name_as_username = explode(" ", $name);
+			$this->first_name_as_username = $name_as_username[0];
+			$this->last_name_as_username = $name_as_username[1];
+			for($i=0; $i<3; $i++)
+			{
+				$this->username_available[$i] = (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
+			}
+
+			echo "Usernames available: $this->username_available[0], $this->username_available[1], $this->username_available[2]";
+		}
+
+		private function register()
+		{
+			$sql = mysql_query("INSERT INTO users('name', 'username', 'email', 'password') VALUES('".$this->name."', '".$this->username."', '".$this->email."', '".$this->password."' )");
+			try
+			{
+				if(!$sql)				
+					throw new Exception("Unable to insert record in the table");
+				else
+					echo "Successfully registered";
+			}
+			catch(Exception $e)
+			{
+				echo $e->getMessage();
+			}
+		
+		}
 	}
 
+	// if(isset($_POST['submit']))
+	// {
+		$name = "kartik";
+		$username = "kartik";
+		$email = "chauhan.kartik25@gmail.com";
+		$password = "heyhey";
+		$confirm_password = "heyhey";
+		// $name = mysql_real_escape_string($_POST['name']);
+		// $username = mysql_real_escape_string($_POST['username']);
+		// $email = mysql_real_escape_string($_POST['email']);
+		// $password = mysql_real_escape_string($_POST['password']);
+		// $confirm_password = mysql_real_escape_string($_POST['confirm_password']);
 
-	if(isset($_POST['submit']))
-	{
-		$newUser = new signup($_POST['name'], $_POST['username'], $_POST['email'], $_POST['password'], $_POST['confirm_password']);
-		json_encode($newUser->json);
-	}
-	else
-	{
-		header("home.html");
-	}
+		$newUser = new signup($name, $username, $email, $password, $confirm_password);
+
+	// }
+	// else
+	// {
+	// 	echo "not sent through form";
+	// }
 
 ?>

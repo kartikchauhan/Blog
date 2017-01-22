@@ -11,6 +11,10 @@
 			{
 				echo "unable to connect to the database";
 			}
+			else
+			{
+				echo "connected to the database<br>";
+			}
 			return $conn;
 		}
 
