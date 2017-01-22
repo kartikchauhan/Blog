@@ -9,6 +9,7 @@
 			private $name_as_username;
 			private $first_name_as_username;
 			private $last_name_as_username;
+			public $json = new splFixedArray(2);
 
 			private function __set($property, $value)
 			{
@@ -65,7 +66,8 @@
 			}
 			catch(Exception $e)
 			{
-				echo $e->getMessage();
+				$this->json['status'] = 1;
+				$this->json['message'] = $e->getMessage();
 			}
 
 			private function isUserExists($)
@@ -81,7 +83,8 @@
 				}
 				catch(Exception $e)
 				{
-					echo $e->getMessage();
+					$this->json['status'] = 2;
+					$this->json['message'] = $e->getMessage();
 				}
 			}
 
@@ -96,24 +99,27 @@
 
 			private function suggestUserName($name, $email)
 			{
+				$this->json['status'] = 3;
+				$this->json['message'] = "Usernames available: ";
 				$this->name_as_username = explode(" ", $name);
 				$this->first_name_as_username = $name_as_username[0];
 				$this->last_name_as_username = $name_as_username[1];
 				for($i=0; $i<3; $i++)
 				{
-					$this->username_available[$i] = (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
+					$this->json['message'] = $this->json['message'] + (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
+					// $this->username_available[$i] = (mt_rand()%2==0) ? ($this->first_name_as_username + "_" + mt_rand(11,999)) : ($this->last_name_as_username + "_" + mt_rand(11,999));
 				}
 
 			}
 		}
 
 	}
-	
 
 
 	if(isset($_POST['submit']))
 	{
 		$newUser = new signup($_POST['name'], $_POST['username'], $_POST['email'], $_POST['password'], $_POST['confirm_password']);
+		json_encode($newUser->json);
 	}
 	else
 	{
